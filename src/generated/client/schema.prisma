@@ -21,7 +21,7 @@ model RouletteBet {
   eventId                String    @unique
   playerLightningAddress String
   status                 BetStatus @default(INIT)
-  blockHeight            Int?
+  secret                 String
 
   // Lightning payment fields
   paymentHash    String?   @unique
@@ -38,9 +38,11 @@ enum BetType {
 }
 
 enum BetStatus {
-  INIT         @map("init")
-  PLACED       @map("placed")
-  LOST         @map("lost")
-  WON          @map("won")
-  WON_AND_PAID @map("wonAndPaid")
+  INIT               @map("init")
+  PLACED             @map("placed")
+  LOST               @map("lost")
+  WON                @map("won")
+  WON_AND_PAID       @map("wonAndPaid")
+  WON_PAYMENT_FAILED @map("wonPaymentFailed")
+  WON_PAYMENT_ERROR  @map("wonPaymentError")
 }

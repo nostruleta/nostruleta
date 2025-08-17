@@ -1,6 +1,6 @@
 import { PrismaClient, RouletteBet, BetType, BetStatus } from '../generated/client';
 import { getPrismaClient } from './database.js';
-import { CreateRouletteBetInput, UpdateRouletteBetInput } from '../types.js';
+import { CreateRouletteBetInput } from '../types.js';
 
 export class RouletteBetRepository {
   private prisma: PrismaClient;
@@ -19,6 +19,7 @@ export class RouletteBetRepository {
         userNpub: input.userNpub,
         eventId: input.eventId,
         playerLightningAddress: input.playerLightningAddress,
+        secret: input.secret
       },
     });
   }
@@ -55,16 +56,8 @@ export class RouletteBetRepository {
     });
   }
 
-  // Find bets by block height
-  async findByBlockHeight(blockHeight: number): Promise<RouletteBet[]> {
-    return await this.prisma.rouletteBet.findMany({
-      where: { blockHeight },
-      orderBy: { createdAt: 'desc' },
-    });
-  }
-
   // Update bet
-  async update(id: string, input: Partial<Pick<RouletteBet, 'status' | 'blockHeight' | 'paymentHash'>> & { rouletteNumber?: number; payout?: number }): Promise<RouletteBet | null> {
+  async update(id: string, input: Partial<Pick<RouletteBet, 'status' | 'paymentHash'>> & { rouletteNumber?: number; payout?: number }): Promise<RouletteBet | null> {
     try {
       return await this.prisma.rouletteBet.update({
         where: { id },

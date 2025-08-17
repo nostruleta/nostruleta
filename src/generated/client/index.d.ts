@@ -36,7 +36,9 @@ export const BetStatus: {
   PLACED: 'PLACED',
   LOST: 'LOST',
   WON: 'WON',
-  WON_AND_PAID: 'WON_AND_PAID'
+  WON_AND_PAID: 'WON_AND_PAID',
+  WON_PAYMENT_FAILED: 'WON_PAYMENT_FAILED',
+  WON_PAYMENT_ERROR: 'WON_PAYMENT_ERROR'
 };
 
 export type BetStatus = (typeof BetStatus)[keyof typeof BetStatus]
@@ -889,12 +891,10 @@ export namespace Prisma {
 
   export type RouletteBetAvgAggregateOutputType = {
     amountInSats: number | null
-    blockHeight: number | null
   }
 
   export type RouletteBetSumAggregateOutputType = {
     amountInSats: number | null
-    blockHeight: number | null
   }
 
   export type RouletteBetMinAggregateOutputType = {
@@ -907,7 +907,7 @@ export namespace Prisma {
     eventId: string | null
     playerLightningAddress: string | null
     status: $Enums.BetStatus | null
-    blockHeight: number | null
+    secret: string | null
     paymentHash: string | null
     paymentRequest: string | null
     invoicePaid: boolean | null
@@ -924,7 +924,7 @@ export namespace Prisma {
     eventId: string | null
     playerLightningAddress: string | null
     status: $Enums.BetStatus | null
-    blockHeight: number | null
+    secret: string | null
     paymentHash: string | null
     paymentRequest: string | null
     invoicePaid: boolean | null
@@ -941,7 +941,7 @@ export namespace Prisma {
     eventId: number
     playerLightningAddress: number
     status: number
-    blockHeight: number
+    secret: number
     paymentHash: number
     paymentRequest: number
     invoicePaid: number
@@ -952,12 +952,10 @@ export namespace Prisma {
 
   export type RouletteBetAvgAggregateInputType = {
     amountInSats?: true
-    blockHeight?: true
   }
 
   export type RouletteBetSumAggregateInputType = {
     amountInSats?: true
-    blockHeight?: true
   }
 
   export type RouletteBetMinAggregateInputType = {
@@ -970,7 +968,7 @@ export namespace Prisma {
     eventId?: true
     playerLightningAddress?: true
     status?: true
-    blockHeight?: true
+    secret?: true
     paymentHash?: true
     paymentRequest?: true
     invoicePaid?: true
@@ -987,7 +985,7 @@ export namespace Prisma {
     eventId?: true
     playerLightningAddress?: true
     status?: true
-    blockHeight?: true
+    secret?: true
     paymentHash?: true
     paymentRequest?: true
     invoicePaid?: true
@@ -1004,7 +1002,7 @@ export namespace Prisma {
     eventId?: true
     playerLightningAddress?: true
     status?: true
-    blockHeight?: true
+    secret?: true
     paymentHash?: true
     paymentRequest?: true
     invoicePaid?: true
@@ -1108,7 +1106,7 @@ export namespace Prisma {
     eventId: string
     playerLightningAddress: string
     status: $Enums.BetStatus
-    blockHeight: number | null
+    secret: string
     paymentHash: string | null
     paymentRequest: string | null
     invoicePaid: boolean
@@ -1144,7 +1142,7 @@ export namespace Prisma {
     eventId?: boolean
     playerLightningAddress?: boolean
     status?: boolean
-    blockHeight?: boolean
+    secret?: boolean
     paymentHash?: boolean
     paymentRequest?: boolean
     invoicePaid?: boolean
@@ -1161,7 +1159,7 @@ export namespace Prisma {
     eventId?: boolean
     playerLightningAddress?: boolean
     status?: boolean
-    blockHeight?: boolean
+    secret?: boolean
     paymentHash?: boolean
     paymentRequest?: boolean
     invoicePaid?: boolean
@@ -1178,7 +1176,7 @@ export namespace Prisma {
     eventId?: boolean
     playerLightningAddress?: boolean
     status?: boolean
-    blockHeight?: boolean
+    secret?: boolean
     paymentHash?: boolean
     paymentRequest?: boolean
     invoicePaid?: boolean
@@ -1199,7 +1197,7 @@ export namespace Prisma {
       eventId: string
       playerLightningAddress: string
       status: $Enums.BetStatus
-      blockHeight: number | null
+      secret: string
       paymentHash: string | null
       paymentRequest: string | null
       invoicePaid: boolean
@@ -1606,7 +1604,7 @@ export namespace Prisma {
     readonly eventId: FieldRef<"RouletteBet", 'String'>
     readonly playerLightningAddress: FieldRef<"RouletteBet", 'String'>
     readonly status: FieldRef<"RouletteBet", 'BetStatus'>
-    readonly blockHeight: FieldRef<"RouletteBet", 'Int'>
+    readonly secret: FieldRef<"RouletteBet", 'String'>
     readonly paymentHash: FieldRef<"RouletteBet", 'String'>
     readonly paymentRequest: FieldRef<"RouletteBet", 'String'>
     readonly invoicePaid: FieldRef<"RouletteBet", 'Boolean'>
@@ -1923,7 +1921,7 @@ export namespace Prisma {
     eventId: 'eventId',
     playerLightningAddress: 'playerLightningAddress',
     status: 'status',
-    blockHeight: 'blockHeight',
+    secret: 'secret',
     paymentHash: 'paymentHash',
     paymentRequest: 'paymentRequest',
     invoicePaid: 'invoicePaid',
@@ -2069,7 +2067,7 @@ export namespace Prisma {
     eventId?: StringFilter<"RouletteBet"> | string
     playerLightningAddress?: StringFilter<"RouletteBet"> | string
     status?: EnumBetStatusFilter<"RouletteBet"> | $Enums.BetStatus
-    blockHeight?: IntNullableFilter<"RouletteBet"> | number | null
+    secret?: StringFilter<"RouletteBet"> | string
     paymentHash?: StringNullableFilter<"RouletteBet"> | string | null
     paymentRequest?: StringNullableFilter<"RouletteBet"> | string | null
     invoicePaid?: BoolFilter<"RouletteBet"> | boolean
@@ -2086,7 +2084,7 @@ export namespace Prisma {
     eventId?: SortOrder
     playerLightningAddress?: SortOrder
     status?: SortOrder
-    blockHeight?: SortOrderInput | SortOrder
+    secret?: SortOrder
     paymentHash?: SortOrderInput | SortOrder
     paymentRequest?: SortOrderInput | SortOrder
     invoicePaid?: SortOrder
@@ -2107,7 +2105,7 @@ export namespace Prisma {
     userNpub?: StringFilter<"RouletteBet"> | string
     playerLightningAddress?: StringFilter<"RouletteBet"> | string
     status?: EnumBetStatusFilter<"RouletteBet"> | $Enums.BetStatus
-    blockHeight?: IntNullableFilter<"RouletteBet"> | number | null
+    secret?: StringFilter<"RouletteBet"> | string
     paymentRequest?: StringNullableFilter<"RouletteBet"> | string | null
     invoicePaid?: BoolFilter<"RouletteBet"> | boolean
     paidAt?: DateTimeNullableFilter<"RouletteBet"> | Date | string | null
@@ -2123,7 +2121,7 @@ export namespace Prisma {
     eventId?: SortOrder
     playerLightningAddress?: SortOrder
     status?: SortOrder
-    blockHeight?: SortOrderInput | SortOrder
+    secret?: SortOrder
     paymentHash?: SortOrderInput | SortOrder
     paymentRequest?: SortOrderInput | SortOrder
     invoicePaid?: SortOrder
@@ -2148,7 +2146,7 @@ export namespace Prisma {
     eventId?: StringWithAggregatesFilter<"RouletteBet"> | string
     playerLightningAddress?: StringWithAggregatesFilter<"RouletteBet"> | string
     status?: EnumBetStatusWithAggregatesFilter<"RouletteBet"> | $Enums.BetStatus
-    blockHeight?: IntNullableWithAggregatesFilter<"RouletteBet"> | number | null
+    secret?: StringWithAggregatesFilter<"RouletteBet"> | string
     paymentHash?: StringNullableWithAggregatesFilter<"RouletteBet"> | string | null
     paymentRequest?: StringNullableWithAggregatesFilter<"RouletteBet"> | string | null
     invoicePaid?: BoolWithAggregatesFilter<"RouletteBet"> | boolean
@@ -2165,7 +2163,7 @@ export namespace Prisma {
     eventId: string
     playerLightningAddress: string
     status?: $Enums.BetStatus
-    blockHeight?: number | null
+    secret: string
     paymentHash?: string | null
     paymentRequest?: string | null
     invoicePaid?: boolean
@@ -2182,7 +2180,7 @@ export namespace Prisma {
     eventId: string
     playerLightningAddress: string
     status?: $Enums.BetStatus
-    blockHeight?: number | null
+    secret: string
     paymentHash?: string | null
     paymentRequest?: string | null
     invoicePaid?: boolean
@@ -2199,7 +2197,7 @@ export namespace Prisma {
     eventId?: StringFieldUpdateOperationsInput | string
     playerLightningAddress?: StringFieldUpdateOperationsInput | string
     status?: EnumBetStatusFieldUpdateOperationsInput | $Enums.BetStatus
-    blockHeight?: NullableIntFieldUpdateOperationsInput | number | null
+    secret?: StringFieldUpdateOperationsInput | string
     paymentHash?: NullableStringFieldUpdateOperationsInput | string | null
     paymentRequest?: NullableStringFieldUpdateOperationsInput | string | null
     invoicePaid?: BoolFieldUpdateOperationsInput | boolean
@@ -2216,7 +2214,7 @@ export namespace Prisma {
     eventId?: StringFieldUpdateOperationsInput | string
     playerLightningAddress?: StringFieldUpdateOperationsInput | string
     status?: EnumBetStatusFieldUpdateOperationsInput | $Enums.BetStatus
-    blockHeight?: NullableIntFieldUpdateOperationsInput | number | null
+    secret?: StringFieldUpdateOperationsInput | string
     paymentHash?: NullableStringFieldUpdateOperationsInput | string | null
     paymentRequest?: NullableStringFieldUpdateOperationsInput | string | null
     invoicePaid?: BoolFieldUpdateOperationsInput | boolean
@@ -2233,7 +2231,7 @@ export namespace Prisma {
     eventId: string
     playerLightningAddress: string
     status?: $Enums.BetStatus
-    blockHeight?: number | null
+    secret: string
     paymentHash?: string | null
     paymentRequest?: string | null
     invoicePaid?: boolean
@@ -2250,7 +2248,7 @@ export namespace Prisma {
     eventId?: StringFieldUpdateOperationsInput | string
     playerLightningAddress?: StringFieldUpdateOperationsInput | string
     status?: EnumBetStatusFieldUpdateOperationsInput | $Enums.BetStatus
-    blockHeight?: NullableIntFieldUpdateOperationsInput | number | null
+    secret?: StringFieldUpdateOperationsInput | string
     paymentHash?: NullableStringFieldUpdateOperationsInput | string | null
     paymentRequest?: NullableStringFieldUpdateOperationsInput | string | null
     invoicePaid?: BoolFieldUpdateOperationsInput | boolean
@@ -2267,7 +2265,7 @@ export namespace Prisma {
     eventId?: StringFieldUpdateOperationsInput | string
     playerLightningAddress?: StringFieldUpdateOperationsInput | string
     status?: EnumBetStatusFieldUpdateOperationsInput | $Enums.BetStatus
-    blockHeight?: NullableIntFieldUpdateOperationsInput | number | null
+    secret?: StringFieldUpdateOperationsInput | string
     paymentHash?: NullableStringFieldUpdateOperationsInput | string | null
     paymentRequest?: NullableStringFieldUpdateOperationsInput | string | null
     invoicePaid?: BoolFieldUpdateOperationsInput | boolean
@@ -2325,17 +2323,6 @@ export namespace Prisma {
     not?: NestedEnumBetStatusFilter<$PrismaModel> | $Enums.BetStatus
   }
 
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -2382,7 +2369,7 @@ export namespace Prisma {
     eventId?: SortOrder
     playerLightningAddress?: SortOrder
     status?: SortOrder
-    blockHeight?: SortOrder
+    secret?: SortOrder
     paymentHash?: SortOrder
     paymentRequest?: SortOrder
     invoicePaid?: SortOrder
@@ -2391,7 +2378,6 @@ export namespace Prisma {
 
   export type RouletteBetAvgOrderByAggregateInput = {
     amountInSats?: SortOrder
-    blockHeight?: SortOrder
   }
 
   export type RouletteBetMaxOrderByAggregateInput = {
@@ -2404,7 +2390,7 @@ export namespace Prisma {
     eventId?: SortOrder
     playerLightningAddress?: SortOrder
     status?: SortOrder
-    blockHeight?: SortOrder
+    secret?: SortOrder
     paymentHash?: SortOrder
     paymentRequest?: SortOrder
     invoicePaid?: SortOrder
@@ -2421,7 +2407,7 @@ export namespace Prisma {
     eventId?: SortOrder
     playerLightningAddress?: SortOrder
     status?: SortOrder
-    blockHeight?: SortOrder
+    secret?: SortOrder
     paymentHash?: SortOrder
     paymentRequest?: SortOrder
     invoicePaid?: SortOrder
@@ -2430,7 +2416,6 @@ export namespace Prisma {
 
   export type RouletteBetSumOrderByAggregateInput = {
     amountInSats?: SortOrder
-    blockHeight?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -2501,22 +2486,6 @@ export namespace Prisma {
     _max?: NestedEnumBetStatusFilter<$PrismaModel>
   }
 
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
   export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -2581,14 +2550,6 @@ export namespace Prisma {
     set?: $Enums.BetStatus
   }
 
-  export type NullableIntFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
   }
@@ -2649,17 +2610,6 @@ export namespace Prisma {
     in?: $Enums.BetStatus[] | ListEnumBetStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.BetStatus[] | ListEnumBetStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumBetStatusFilter<$PrismaModel> | $Enums.BetStatus
-  }
-
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedStringNullableFilter<$PrismaModel = never> = {
@@ -2770,33 +2720,6 @@ export namespace Prisma {
     _max?: NestedEnumBetStatusFilter<$PrismaModel>
   }
 
-  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -2812,6 +2735,17 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {

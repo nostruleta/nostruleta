@@ -7,7 +7,7 @@ import type { RouletteBet } from '../generated/client';
  * Utility functions for roulette game functionality
  */
 
-type ROULETTE_COLOR = 'red' | 'black' | 'green'
+export type ROULETTE_COLOR = 'red' | 'black' | 'green'
 
 /**
  * Parses a roulette bet from a nostr message and stores it in the database
@@ -55,7 +55,7 @@ export async function parseRouletteBet(
     // Validate bet type
     let betType: 'color' | 'number';
     
-    if (bet === 'red' || bet === 'black') {
+    if (bet === 'red' || bet === 'black' || bet === 'green') {
       betType = 'color';
     } else {
       // Check if it's a valid roulette number (0-36)
@@ -67,6 +67,10 @@ export async function parseRouletteBet(
       betType = 'number';
     }
 
+    // store commitment
+    const randomBytes = crypto.randomBytes(32);
+    const secret = crypto.createHash('sha256').update(randomBytes).digest('hex');
+
     // Store the bet in the database
     const repository = new RouletteBetRepository();
     const createdBet = await repository.create({
@@ -75,7 +79,8 @@ export async function parseRouletteBet(
       amountInSats: amount,
       userNpub,
       eventId,
-      playerLightningAddress
+      playerLightningAddress,
+      secret
     });
 
     return createdBet;
@@ -119,15 +124,19 @@ interface GameResult {
   color: ROULETTE_COLOR
 }
 
-export function calculateWinnings(rouletteBet: RouletteBet, blockHash: string): GameResult {
-  const num = intFromSeed(blockHash, 0, 37);
+export function calculateWinnings(rouletteBet: RouletteBet): GameResult {
+  const num = intFromSeed(rouletteBet.secret, 0, 37);
   const color = getRouletteColor(num);
   const numStr = num === 37 ? "00" : num.toString()
 
   let winnings = 0
 
   if (rouletteBet.betType === 'COLOR' && rouletteBet.bet === color) {
-    winnings = rouletteBet.amountInSats * 2
+    if (color === 'green') {
+      winnings = rouletteBet.amountInSats * 18
+    } else {
+      winnings = rouletteBet.amountInSats * 2
+    }
   }
   if (rouletteBet.betType === 'NUMBER' && rouletteBet.bet === numStr) {
     winnings = rouletteBet.amountInSats * 36

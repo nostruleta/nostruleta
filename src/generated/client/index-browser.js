@@ -132,7 +132,7 @@ exports.Prisma.RouletteBetScalarFieldEnum = {
   eventId: 'eventId',
   playerLightningAddress: 'playerLightningAddress',
   status: 'status',
-  blockHeight: 'blockHeight',
+  secret: 'secret',
   paymentHash: 'paymentHash',
   paymentRequest: 'paymentRequest',
   invoicePaid: 'invoicePaid',
@@ -163,7 +163,9 @@ exports.BetStatus = exports.$Enums.BetStatus = {
   PLACED: 'PLACED',
   LOST: 'LOST',
   WON: 'WON',
-  WON_AND_PAID: 'WON_AND_PAID'
+  WON_AND_PAID: 'WON_AND_PAID',
+  WON_PAYMENT_FAILED: 'WON_PAYMENT_FAILED',
+  WON_PAYMENT_ERROR: 'WON_PAYMENT_ERROR'
 };
 
 exports.Prisma.ModelName = {

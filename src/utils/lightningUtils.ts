@@ -180,17 +180,3 @@ export async function payWinnings(
     comment
   });
 }
-
-/**
- * Utility function to format invoice for display
- */
-export function formatInvoiceForDisplay(invoice: any, amount: number, description?: string): string {
-  const lines = [
-    `⚡ Lightning Invoice Generated`,
-    `💰 Amount: ${amount} sats`,
-    `📝 Description: ${description || 'Nostr Bot Payment'}`,
-    `🔗 Invoice: ${invoice.paymentRequest}`
-  ];
-
-  return lines.join('\n');
-}

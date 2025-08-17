@@ -21,7 +21,7 @@ model RouletteBet {
   eventId       String   @unique
   playerLightningAddress  String
   status        BetStatus @default(INIT)
-  blockHeight   Int?
+  secret        String
   
   // Lightning payment fields
   paymentHash   String?  @unique

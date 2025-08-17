@@ -50,6 +50,7 @@ export interface CreateRouletteBetInput {
   userNpub: string;
   eventId: string;
   playerLightningAddress: string;
+  secret: string;
 }
 
 export interface UpdateRouletteBetInput {
@@ -116,8 +117,5 @@ export interface RouletteBet {
 
 export interface EnvConfig {
   NOSTR_BOT_NSEC: string;
-  RPC_USER?: string;
-  RPC_PASSWORD?: string;
-  RPC_URL?: string;
   LIGHTNING_ADDRESS?: string;
 }

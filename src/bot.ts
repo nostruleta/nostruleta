@@ -1,8 +1,7 @@
 import 'websocket-polyfill';
 import { SimplePool, getPublicKey, finalizeEvent, nip19, type Filter } from 'nostr-tools';
-import BlockPollService from './utils/blockPoll.js';
-import { parseRouletteBet, calculateWinnings } from './utils/ruletaUtils.js';
-import { createLightningInvoice, formatInvoiceForDisplay, payWinnings } from './utils/lightningUtils.js';
+import { parseRouletteBet, calculateWinnings, ROULETTE_COLOR } from './utils/ruletaUtils.js';
+import { createLightningInvoice, payWinnings } from './utils/lightningUtils.js';
 import { paymentMonitor } from './monitors/PaymentMonitor.js';
 import { RouletteBetRepository } from './database/rouletteBetRepository.js';
 import type { 
@@ -11,11 +10,15 @@ import type {
   BlockData
 } from './types.js';
 import { RouletteBet } from './generated/client';
+import crypto from "crypto";
+
 
 // Configuration
-const RELAYS: string[] = [
-  'ws://localhost:8080'
-];
+const RELAYS: string[] = process.env.NOSTR_RELAYS?.split(',') || []
+
+function getColorEmoji(color: ROULETTE_COLOR) {
+  return color === 'black' ? '⚫' : color === 'red' ? '🔴' : '🟢';
+}
 
 class NostrBot {
   private pool: SimplePool;
@@ -23,7 +26,6 @@ class NostrBot {
   private botPublicKey: string;
   private botNpub: string;
   private repliedToEvents: Set<string>;
-  private blockService: BlockPollService;
   private betRepository: RouletteBetRepository;
 
   constructor() {
@@ -32,45 +34,8 @@ class NostrBot {
     this.botPublicKey = getPublicKey(this.botSecretKey);
     this.botNpub = nip19.npubEncode(this.botPublicKey);
     this.repliedToEvents = new Set<string>();
-    this.blockService = new BlockPollService();
-    this.betRepository = new RouletteBetRepository();
-
-    this.blockService.registerCallback(this.newBlockCallback)
-    
+    this.betRepository = new RouletteBetRepository();    
     console.log(`🤖 Bot initialized with npub: ${this.botNpub}`);
-  }
-
-  /**
-   * Called every time block poll service finds a new block.
-   * Handles processing bets that have been placed for the current block.
-   * Must be arrow function to preserve `this` binding.
-   * @param blockData 
-   * @returns 
-   */
-  private newBlockCallback = async (blockData: BlockData) => {
-    const { blockHeight, blockHash } = blockData;
-    if (!blockHeight) {
-      throw Error("No block height")
-    }
-    if (!blockHash) {
-      throw Error("No block hash")
-    }
-    
-    const bets = await this.betRepository.findByBlockHeight(blockHeight);
-    
-    for (const bet of bets) {
-      const { winnings, rouletteNumber, color } = calculateWinnings(bet, blockHash);
-      if (winnings > 0) {
-        // Attempt to pay winnings to user's Lightning address
-        await this.payWinningsToUser(bet, winnings, rouletteNumber, color);
-      } else {
-        await this.publishReply(bet.eventId, bet.userNpub, `You lost! The roulette number was ${rouletteNumber} and the color was ${color}.`);
-        await this.betRepository.update(bet.id, {
-          status: 'LOST',
-        })
-      }
-    }
-    return;
   }
 
   private getSecretKey(): Uint8Array {
@@ -219,15 +184,20 @@ class NostrBot {
     );
 
     if (placedBet) {
+      const commitmentHash = crypto.createHash('sha256').update(placedBet.secret).digest('hex');
+      
       let replyContent: string = "";
       try {
         // Generate Lightning invoice for the bet amount
         const invoice = await this.generateInvoiceForBet(placedBet.amountInSats, placedBet.id);
+
+        const betStr = placedBet.betType === 'COLOR' ? getColorEmoji(placedBet.bet as ROULETTE_COLOR) : placedBet.bet;
         
-        replyContent = `Bet initiated: ${placedBet.bet.toUpperCase()} for ${placedBet.amountInSats} sats.`
-          + `\nBet ${placedBet.id} created.`
-          + `\n\n${formatInvoiceForDisplay(invoice, placedBet.amountInSats, `NostRuleta Bet ${placedBet.id} - ${placedBet.amountInSats} sats`)}`
-          + "\n\nOnce invoice is paid, your NostRuleta spin will use the hash of current block +2 as seed.";
+        replyContent = `NostRuleta bet initiated: ${placedBet.amountInSats} sats on ${betStr}!`
+          + `\n\n${invoice.paymentRequest}`
+          + "\nOnce the invoice is paid, your spin will be revealed."
+          + `\nBet ID: ${placedBet.id}`
+          + `\nCommitment hash: ${commitmentHash}`;
         
         await this.publishReply(event.id, event.pubkey, replyContent);
         
@@ -260,29 +230,30 @@ class NostrBot {
     try {
       console.log(`💰 Payment received for bet ${betId} with hash ${paymentHash}`);
 
-      const { blockHeight } = this.blockService.getBlockData()
-      if (!blockHeight) {
-        throw Error("Unable to retrieve block height")
+      const bet = await this.betRepository.findById(betId);
+      if (bet) {
+        const { winnings, rouletteNumber, color } = calculateWinnings(bet)
+        if (winnings > 0) {
+          // Attempt to pay winnings to user's Lightning address
+          await this.payWinningsToUser(bet, winnings, rouletteNumber, color);
+        } else {
+
+          const lossMessage = `Better luck next time!\n\n`
+          + `🎲 Result: ${rouletteNumber} ${getColorEmoji(color)}\n`
+          + `🧩 Committed secret: ${bet.secret}`;
+
+          await this.publishReply(
+            bet.eventId,
+            bet.userNpub,
+            lossMessage
+          );
+          await this.betRepository.update(bet.id, {
+            status: 'LOST',
+          })
+        }
       }
 
-      // Update bet status to PLACED and save blockHeight + 2 for the spin
-      const targetBlockHeight = blockHeight + 2;
-      const updatedBet = await this.betRepository.update(betId, {
-        status: 'PLACED' as any,
-        blockHeight: targetBlockHeight
-      });
-
-      if (!updatedBet) {
-        throw new Error(`Failed to update bet ${betId} in database`);
-      }
-
-      console.log(`✅ Bet ${betId} marked as PLACED with target block ${targetBlockHeight}`);
-      
-      const replyContent = `⚡ Payment confirmed for bet ${betId}!\n\n`
-        + `Your roulette spin will be processed using the hash of block ${targetBlockHeight} as the seed.\n`
-        + `Waiting for block confirmation...`;
-      
-      await this.publishReply(originalEvent.id, originalEvent.pubkey, replyContent);
+      console.log(`✅ Bet ${betId} marked as PLACED`);
       
     } catch (error) {
       console.error(`❌ Error handling payment received for bet ${betId}:`, error);
@@ -308,7 +279,7 @@ class NostrBot {
   /**
    * Pay winnings to user's Lightning address
    */
-  async payWinningsToUser(bet: RouletteBet, winnings: number, rouletteNumber: string, color: string): Promise<void> {
+  async payWinningsToUser(bet: RouletteBet, winnings: number, rouletteNumber: string, color: ROULETTE_COLOR): Promise<void> {
     try {
       console.log(`💰 Processing winnings payment: ${winnings} sats to ${bet.playerLightningAddress}`);
 
@@ -322,8 +293,9 @@ class NostrBot {
       if (paymentResult.success) {
         // Payment successful
         const successMessage = `🎉 Congratulations! You won ${winnings} sats!\n\n`
-          + `🎲 Roulette number: ${rouletteNumber} (${color})\n`
-          + `⚡ Payment sent to: ${bet.playerLightningAddress}\n`;
+          + `🎲 Result: ${rouletteNumber} ${getColorEmoji(color)}\n`
+          + `⚡ Payment sent to: ${bet.playerLightningAddress}\n`
+          + `🧩 Committed secret: ${bet.secret}`;
 
         await this.publishReply(bet.eventId, bet.userNpub, successMessage);
         
@@ -370,7 +342,6 @@ class NostrBot {
       }
     }
   }
-
 
   async start(): Promise<void> {
     console.log('🚀 Starting Nostr bot...');
