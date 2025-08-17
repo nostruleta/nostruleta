@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model RouletteBet {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  betType       BetType
+  bet           String
+  amountInSats  Int
+  userNpub      String
+  eventId       String   @unique
+  status        BetStatus @default(INIT)
+  blockHeight   Int?
+  
+  // Lightning payment fields
+  paymentHash   String?  @unique
+  paymentRequest String?
+  invoicePaid   Boolean  @default(false)
+  paidAt        DateTime?
+
+  @@map("roulette_bets")
+}
+
+enum BetType {
+  COLOR  @map("color")
+  NUMBER @map("number")
+}
+
+enum BetStatus {
+  INIT         @map("init")
+  PLACED       @map("placed")
+  LOST         @map("lost")
+  WON          @map("won")
+  WON_AND_PAID @map("wonAndPaid")
+}

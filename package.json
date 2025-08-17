@@ -1,0 +1,39 @@
+{
+  "name": "nostruleta",
+  "version": "1.0.0",
+  "main": "dist/bot.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx --env-file=.env src/bot.ts",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "db:seed": "tsx prisma/seed.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@getalby/lightning-tools": "^6.0.0",
+    "@getalby/sdk": "^5.1.2",
+    "@prisma/client": "^5.22.0",
+    "electrum-client": "^0.0.6",
+    "lnurl-pay": "^4.0.0",
+    "nostr-tools": "^2.15.2",
+    "pg": "^8.12.0",
+    "websocket-polyfill": "^0.0.3",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.11",
+    "@types/pg": "^8.11.10",
+    "@types/ws": "^8.18.1",
+    "prisma": "^5.22.0",
+    "tsx": "^4.20.4",
+    "typescript": "^5.9.2"
+  },
+  "type": "module"
+}
