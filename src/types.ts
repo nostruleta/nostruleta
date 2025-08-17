@@ -49,6 +49,7 @@ export interface CreateRouletteBetInput {
   amountInSats: number;
   userNpub: string;
   eventId: string;
+  playerLightningAddress: string;
 }
 
 export interface UpdateRouletteBetInput {
@@ -107,7 +108,7 @@ export interface RouletteBet {
   amountInSats: number;
   userNpub: string;
   eventId: string;
-  status: 'INIT' | 'PLACED' | 'WON' | 'LOST';
+  status: 'INIT' | 'PLACED' | 'WON' | 'LOST' | 'WON_PAYMENT_FAILED' | 'WON_PAYMENT_ERROR';
   blockHeight: number | null;
   rouletteNumber?: number;
   payout?: number;

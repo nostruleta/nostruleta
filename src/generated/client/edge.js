@@ -98,8 +98,13 @@ exports.Prisma.RouletteBetScalarFieldEnum = {
   amountInSats: 'amountInSats',
   userNpub: 'userNpub',
   eventId: 'eventId',
+  playerLightningAddress: 'playerLightningAddress',
   status: 'status',
-  blockHeight: 'blockHeight'
+  blockHeight: 'blockHeight',
+  paymentHash: 'paymentHash',
+  paymentRequest: 'paymentRequest',
+  invoicePaid: 'invoicePaid',
+  paidAt: 'paidAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -143,7 +148,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\mtkor\\dev\\nostr-bot\\nostruleta\\src\\generated\\client",
+      "value": "C:\\Users\\mtkor\\dev\\nostr-bot\\git-repo\\nostruleta\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -157,11 +162,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\mtkor\\dev\\nostr-bot\\nostruleta\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\mtkor\\dev\\nostr-bot\\git-repo\\nostruleta\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../.env",
+    "rootEnvPath": null,
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
@@ -171,7 +176,6 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -180,13 +184,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel RouletteBet {\n  id           String    @id @default(cuid())\n  createdAt    DateTime  @default(now())\n  betType      BetType\n  bet          String\n  amountInSats Int\n  userNpub     String\n  eventId      String    @unique\n  status       BetStatus @default(INIT)\n  blockHeight  Int?\n\n  @@map(\"roulette_bets\")\n}\n\nenum BetType {\n  COLOR  @map(\"color\")\n  NUMBER @map(\"number\")\n}\n\nenum BetStatus {\n  INIT         @map(\"init\")\n  PLACED       @map(\"placed\")\n  LOST         @map(\"lost\")\n  WON          @map(\"won\")\n  WON_AND_PAID @map(\"wonAndPaid\")\n}\n",
-  "inlineSchemaHash": "539b573daed5d4e84f6e39523014c734478c24ce22478de374d9cb84e0c0e0fe",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel RouletteBet {\n  id                     String    @id @default(cuid())\n  createdAt              DateTime  @default(now())\n  betType                BetType\n  bet                    String\n  amountInSats           Int\n  userNpub               String\n  eventId                String    @unique\n  playerLightningAddress String\n  status                 BetStatus @default(INIT)\n  blockHeight            Int?\n\n  // Lightning payment fields\n  paymentHash    String?   @unique\n  paymentRequest String?\n  invoicePaid    Boolean   @default(false)\n  paidAt         DateTime?\n\n  @@map(\"roulette_bets\")\n}\n\nenum BetType {\n  COLOR  @map(\"color\")\n  NUMBER @map(\"number\")\n}\n\nenum BetStatus {\n  INIT         @map(\"init\")\n  PLACED       @map(\"placed\")\n  LOST         @map(\"lost\")\n  WON          @map(\"won\")\n  WON_AND_PAID @map(\"wonAndPaid\")\n}\n",
+  "inlineSchemaHash": "ab09045033617a5c07e15743d12a915e346cf14bd677c8c552e4802df803eec1",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"RouletteBet\":{\"dbName\":\"roulette_bets\",\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":true,\"isReadOnly\":false,\"hasDefaultValue\":true,\"type\":\"String\",\"default\":{\"name\":\"cuid\",\"args\":[]},\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":true,\"type\":\"DateTime\",\"default\":{\"name\":\"now\",\"args\":[]},\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"betType\",\"kind\":\"enum\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"BetType\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"bet\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"amountInSats\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"Int\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"userNpub\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"eventId\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":true,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"status\",\"kind\":\"enum\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":true,\"type\":\"BetStatus\",\"default\":\"INIT\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"blockHeight\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":false,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"Int\",\"isGenerated\":false,\"isUpdatedAt\":false}],\"primaryKey\":null,\"uniqueFields\":[],\"uniqueIndexes\":[],\"isGenerated\":false}},\"enums\":{\"BetType\":{\"values\":[{\"name\":\"COLOR\",\"dbName\":\"color\"},{\"name\":\"NUMBER\",\"dbName\":\"number\"}],\"dbName\":null},\"BetStatus\":{\"values\":[{\"name\":\"INIT\",\"dbName\":\"init\"},{\"name\":\"PLACED\",\"dbName\":\"placed\"},{\"name\":\"LOST\",\"dbName\":\"lost\"},{\"name\":\"WON\",\"dbName\":\"won\"},{\"name\":\"WON_AND_PAID\",\"dbName\":\"wonAndPaid\"}],\"dbName\":null}},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"RouletteBet\":{\"dbName\":\"roulette_bets\",\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":true,\"isReadOnly\":false,\"hasDefaultValue\":true,\"type\":\"String\",\"default\":{\"name\":\"cuid\",\"args\":[]},\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":true,\"type\":\"DateTime\",\"default\":{\"name\":\"now\",\"args\":[]},\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"betType\",\"kind\":\"enum\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"BetType\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"bet\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"amountInSats\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"Int\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"userNpub\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"eventId\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":true,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"playerLightningAddress\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"status\",\"kind\":\"enum\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":true,\"type\":\"BetStatus\",\"default\":\"INIT\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"blockHeight\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":false,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"Int\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"paymentHash\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":false,\"isUnique\":true,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"paymentRequest\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":false,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"invoicePaid\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":true,\"type\":\"Boolean\",\"default\":false,\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"paidAt\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":false,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"DateTime\",\"isGenerated\":false,\"isUpdatedAt\":false}],\"primaryKey\":null,\"uniqueFields\":[],\"uniqueIndexes\":[],\"isGenerated\":false}},\"enums\":{\"BetType\":{\"values\":[{\"name\":\"COLOR\",\"dbName\":\"color\"},{\"name\":\"NUMBER\",\"dbName\":\"number\"}],\"dbName\":null},\"BetStatus\":{\"values\":[{\"name\":\"INIT\",\"dbName\":\"init\"},{\"name\":\"PLACED\",\"dbName\":\"placed\"},{\"name\":\"LOST\",\"dbName\":\"lost\"},{\"name\":\"WON\",\"dbName\":\"won\"},{\"name\":\"WON_AND_PAID\",\"dbName\":\"wonAndPaid\"}],\"dbName\":null}},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = undefined
 

@@ -130,8 +130,13 @@ exports.Prisma.RouletteBetScalarFieldEnum = {
   amountInSats: 'amountInSats',
   userNpub: 'userNpub',
   eventId: 'eventId',
+  playerLightningAddress: 'playerLightningAddress',
   status: 'status',
-  blockHeight: 'blockHeight'
+  blockHeight: 'blockHeight',
+  paymentHash: 'paymentHash',
+  paymentRequest: 'paymentRequest',
+  invoicePaid: 'invoicePaid',
+  paidAt: 'paidAt'
 };
 
 exports.Prisma.SortOrder = {

@@ -1,11 +1,13 @@
 import crypto from "crypto";
 import type { RouletteBetParseResult } from '../types';
 import { RouletteBetRepository } from '../database/rouletteBetRepository.js';
-import type { RouletteBet } from '.prisma/client';
+import type { RouletteBet } from '../generated/client';
 
 /**
  * Utility functions for roulette game functionality
  */
+
+type ROULETTE_COLOR = 'red' | 'black' | 'green'
 
 /**
  * Parses a roulette bet from a nostr message and stores it in the database
@@ -21,7 +23,8 @@ export async function parseRouletteBet(
   content: string, 
   botNpub: string, 
   userNpub: string, 
-  eventId: string, 
+  eventId: string,
+  playerLightningAddress: string,
 ): Promise<RouletteBet | null> {
   try {
     // Remove extra whitespace and split by spaces
@@ -64,8 +67,6 @@ export async function parseRouletteBet(
       betType = 'number';
     }
 
-    
-    
     // Store the bet in the database
     const repository = new RouletteBetRepository();
     const createdBet = await repository.create({
@@ -74,6 +75,7 @@ export async function parseRouletteBet(
       amountInSats: amount,
       userNpub,
       eventId,
+      playerLightningAddress
     });
 
     return createdBet;
@@ -85,7 +87,7 @@ export async function parseRouletteBet(
 
 /**
  * Uses a seed to generate a sha256 hash, and modulo to get an integer between
- * min and max. Performs rejection sampling to remove modulo bias.
+ * min and max. Performs totally unnecessary rejection sampling to remove modulo bias.
  */
 export function intFromSeed(seed: string, min: number, max: number): number {
   const range = BigInt(max - min + 1);
@@ -104,68 +106,37 @@ export function intFromSeed(seed: string, min: number, max: number): number {
   }
 }
 
-export function getRouletteColor(n: number): string {
+export function getRouletteColor(n: number): ROULETTE_COLOR {
   if (n < 0 || n > 37) throw new Error("Number must be 0–37 (37 = 00)");
   if (n === 0 || n === 37) return "green";
   const red = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
   return red.has(n) ? "red" : "black";
 }
 
-/**
- * Determines if a bet wins based on the roulette number and bet type
- */
-export function checkWin(bet: string, rouletteNumber: number): boolean {
-  const color = getRouletteColor(rouletteNumber);
-  const betLower = bet.toLowerCase();
-  
-  // Color bets
-  if (betLower === "red" || betLower === "black" || betLower === "green") {
-    return betLower === color;
-  }
-  
-  // Number bets
-  const betNumber = parseInt(bet);
-  if (!isNaN(betNumber)) {
-    return betNumber === rouletteNumber;
-  }
-  
-  // Even/odd bets
-  if (betLower === "even") {
-    return rouletteNumber !== 0 && rouletteNumber !== 37 && rouletteNumber % 2 === 0;
-  }
-  if (betLower === "odd") {
-    return rouletteNumber !== 0 && rouletteNumber !== 37 && rouletteNumber % 2 === 1;
-  }
-  
-  return false;
+interface GameResult {
+  winnings: number
+  rouletteNumber: string
+  color: ROULETTE_COLOR
 }
 
-/**
- * Calculate payout multiplier based on bet type
- */
-export function getPayoutMultiplier(bet: string): number {
-  const betLower = bet.toLowerCase();
-  
-  // Color bets (red/black) - 2x payout
-  if (betLower === "red" || betLower === "black") {
-    return 2;
+export function calculateWinnings(rouletteBet: RouletteBet, blockHash: string): GameResult {
+  const num = intFromSeed(blockHash, 0, 37);
+  const color = getRouletteColor(num);
+  const numStr = num === 37 ? "00" : num.toString()
+
+  let winnings = 0
+
+  if (rouletteBet.betType === 'COLOR' && rouletteBet.bet === color) {
+    winnings = rouletteBet.amountInSats * 2
   }
-  
-  // Green (0 or 00) - higher payout due to lower odds
-  if (betLower === "green") {
-    return 18; // 36:1 odds for green
+  if (rouletteBet.betType === 'NUMBER' && rouletteBet.bet === numStr) {
+    winnings = rouletteBet.amountInSats * 36
   }
-  
-  // Number bets - 36x payout
-  const betNumber = parseInt(bet);
-  if (!isNaN(betNumber) && betNumber >= 0 && betNumber <= 37) {
-    return 36;
+
+  return {
+    winnings,
+    rouletteNumber: numStr,
+    color
   }
-  
-  // Even/odd bets - 2x payout
-  if (betLower === "even" || betLower === "odd") {
-    return 2;
-  }
-  
-  return 1; // Default fallback
 }
+

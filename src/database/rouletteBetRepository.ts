@@ -18,6 +18,7 @@ export class RouletteBetRepository {
         amountInSats: input.amountInSats,
         userNpub: input.userNpub,
         eventId: input.eventId,
+        playerLightningAddress: input.playerLightningAddress,
       },
     });
   }
@@ -63,7 +64,7 @@ export class RouletteBetRepository {
   }
 
   // Update bet
-  async update(id: string, input: Partial<Pick<RouletteBet, 'status' | 'blockHeight'>> & { rouletteNumber?: number; payout?: number }): Promise<RouletteBet | null> {
+  async update(id: string, input: Partial<Pick<RouletteBet, 'status' | 'blockHeight' | 'paymentHash'>> & { rouletteNumber?: number; payout?: number }): Promise<RouletteBet | null> {
     try {
       return await this.prisma.rouletteBet.update({
         where: { id },
